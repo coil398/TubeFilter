@@ -8,15 +8,15 @@ export default defineManifest({
     action: {
         default_popup: 'src/popup/index.html',
         default_icon: {
-            '16': 'icons/icon-16.png',
-            '48': 'icons/icon-48.png',
-            '128': 'icons/icon-128.png',
+            '16': 'src/icons/icon-16.png',
+            '48': 'src/icons/icon-48.png',
+            '128': 'src/icons/icon-128.png',
         },
     },
     icons: {
-        '16': 'icons/icon-16.png',
-        '48': 'icons/icon-48.png',
-        '128': 'icons/icon-128.png',
+        '16': 'src/icons/icon-16.png',
+        '48': 'src/icons/icon-48.png',
+        '128': 'src/icons/icon-128.png',
     },
     permissions: ['storage', 'tabs'],
     host_permissions: ['https://www.youtube.com/*'],

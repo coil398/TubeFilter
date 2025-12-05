@@ -13,7 +13,8 @@ export interface Settings {
 }
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {
-    const debug = false;
+    // Set to true for verbose logging during development
+    const debug = true;
 
     if (debug) console.log(`TubeFilter [${index}]: Processing element`, element);
 
