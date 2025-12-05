@@ -1,11 +1,12 @@
 import { parseViewCount, isLive } from './parser';
 
-interface Settings {
+export interface Settings {
     minViews: number;
     minConcurrent: number;
     filterMode: 'hide' | 'opacity';
     enableVideoFilter: boolean;
     enableLiveFilter: boolean;
+    enableBannerFilter: boolean;
 }
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {
@@ -101,5 +102,13 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
         // Reset styles if previously filtered
         element.style.display = '';
         element.style.opacity = '';
+    }
+};
+
+export const processBannerElement = (element: HTMLElement, settings: Settings) => {
+    if (settings.enableBannerFilter) {
+        element.style.display = 'none';
+    } else {
+        element.style.display = '';
     }
 };

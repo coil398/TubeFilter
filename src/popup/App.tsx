@@ -6,6 +6,7 @@ interface Settings {
   filterMode: 'hide' | 'opacity'
   enableVideoFilter: boolean
   enableLiveFilter: boolean
+  enableBannerFilter: boolean
 }
 
 const defaultSettings: Settings = {
@@ -14,6 +15,7 @@ const defaultSettings: Settings = {
   filterMode: 'opacity',
   enableVideoFilter: true,
   enableLiveFilter: true,
+  enableBannerFilter: true,
 }
 
 function App() {
@@ -92,8 +94,11 @@ function App() {
               value={settings.minConcurrent}
               onChange={(e) => setSettings({ ...settings, minConcurrent: Number(e.target.value) })}
               className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-600"
-              disabled={!settings.enableLiveFilter}
             />
+            {/* The original enableLiveFilter button was here, it's now moved below */}
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="font-medium text-gray-300">Enable Live Filter</label>
             <button
               onClick={() => setSettings({ ...settings, enableLiveFilter: !settings.enableLiveFilter })}
               className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${
@@ -104,6 +109,22 @@ function App() {
               <div
                 className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
                   settings.enableLiveFilter ? 'left-6' : 'left-1'
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="font-medium text-gray-300">Hide Top Banner</label>
+            <button
+              onClick={() => setSettings({ ...settings, enableBannerFilter: !settings.enableBannerFilter })}
+              className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${
+                settings.enableBannerFilter ? 'bg-red-600' : 'bg-gray-700'
+              }`}
+              title={settings.enableBannerFilter ? 'Show Banner' : 'Hide Banner'}
+            >
+              <div
+                className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
+                  settings.enableBannerFilter ? 'left-6' : 'left-1'
                 }`}
               />
             </button>
