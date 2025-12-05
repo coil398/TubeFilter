@@ -19,6 +19,8 @@ TubeFilter is a Chrome Extension that filters YouTube videos based on view count
 
 ## Installation
 
+詳細なインストール手順については [RELEASE_GUIDE.md](./RELEASE_GUIDE.md) を参照してください。
+
 1.  Clone the repository.
 2.  Run `npm install` to install dependencies.
 3.  Run `npm run build` to build the extension.
