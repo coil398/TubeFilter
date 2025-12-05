@@ -50,9 +50,12 @@ const runFilter = () => {
 
     const bannerSelectors = [
         '#masthead-ad',
-        // 'ytd-rich-section-renderer.style-scope.ytd-rich-grid-renderer' // This was too broad and hid Shorts shelves
-        'ytd-rich-section-renderer > #content > ytd-statement-banner-renderer', // Specific to statement banner
-        'ytd-rich-section-renderer > #content > ytd-banner-promo-renderer-background' // Another banner type
+        'ytd-rich-section-renderer > #content > ytd-statement-banner-renderer',
+        'ytd-rich-section-renderer > #content > ytd-banner-promo-renderer-background',
+        'ytd-banner-promo-renderer', // General promo banner
+        'ytd-ad-slot-renderer', // Ad slot
+        'ytd-in-feed-ad-layout-renderer', // In-feed ad
+        'ytd-rich-section-renderer > #content > ytd-banner-renderer' // Generic banner inside section
     ];
 
     const videos = document.querySelectorAll(videoSelectors.join(','));
