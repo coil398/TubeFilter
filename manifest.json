@@ -1,9 +1,0 @@
-{
-  "manifest_version": 3,
-  "name": "TubeFilter",
-  "version": "1.0",
-  "description": "A simple Hello World Chrome Extension",
-  "action": {
-    "default_popup": "popup.html"
-  }
-}
