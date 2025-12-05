@@ -7,6 +7,16 @@ export default defineManifest({
     description: 'Filter YouTube videos based on views and other metrics.',
     action: {
         default_popup: 'src/popup/index.html',
+        default_icon: {
+            '16': 'public/icons/icon-16.png',
+            '48': 'public/icons/icon-48.png',
+            '128': 'public/icons/icon-128.png',
+        },
+    },
+    icons: {
+        '16': 'public/icons/icon-16.png',
+        '48': 'public/icons/icon-48.png',
+        '128': 'public/icons/icon-128.png',
     },
     permissions: ['storage', 'tabs'],
     host_permissions: ['https://www.youtube.com/*'],
