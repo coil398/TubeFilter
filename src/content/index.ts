@@ -8,6 +8,7 @@ const defaultSettings: Settings = {
     enableLiveFilter: true,
     enableBannerFilter: true,
     enableMixFilter: true,
+    enableShortsFilter: true,
 };
 
 let currentSettings: Settings = defaultSettings;
@@ -28,23 +29,28 @@ chrome.storage.onChanged.addListener((changes) => {
     if (changes.enableLiveFilter) currentSettings.enableLiveFilter = changes.enableLiveFilter.newValue as boolean;
     if (changes.enableBannerFilter) currentSettings.enableBannerFilter = changes.enableBannerFilter.newValue as boolean;
     if (changes.enableMixFilter) currentSettings.enableMixFilter = changes.enableMixFilter.newValue as boolean;
+    if (changes.enableShortsFilter) currentSettings.enableShortsFilter = changes.enableShortsFilter.newValue as boolean;
     runFilter();
 });
 
 const runFilter = () => {
-    const BUILD_TIMESTAMP = '2025-12-05T14:30:00';
+    const BUILD_TIMESTAMP = '2025-12-05T14:45:00';
     console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
     const videoSelectors = [
         'ytd-rich-item-renderer', // Home
         'ytd-video-renderer', // Search
         'ytd-compact-video-renderer', // Sidebar
         'ytd-grid-video-renderer', // Channel
-        'ytd-radio-renderer' // Mix lists
+        'ytd-radio-renderer', // Mix lists
+        'ytd-reel-item-renderer', // Shorts (individual)
+        'ytd-rich-shelf-renderer' // Shorts (shelf)
     ];
 
     const bannerSelectors = [
         '#masthead-ad',
-        'ytd-rich-section-renderer.style-scope.ytd-rich-grid-renderer' // Often contains big banners
+        // 'ytd-rich-section-renderer.style-scope.ytd-rich-grid-renderer' // This was too broad and hid Shorts shelves
+        'ytd-rich-section-renderer > #content > ytd-statement-banner-renderer', // Specific to statement banner
+        'ytd-rich-section-renderer > #content > ytd-banner-promo-renderer-background' // Another banner type
     ];
 
     const videos = document.querySelectorAll(videoSelectors.join(','));
@@ -58,9 +64,13 @@ const runFilter = () => {
     console.log(`TubeFilter: Found ${banners.length} banner elements`);
 
     banners.forEach((banner) => {
-        // Only hide if it looks like a banner (e.g. contains ytd-statement-banner-renderer or is the first section)
-        // For now, let's target all rich sections as they are usually shelves/banners on Home
-        processBannerElement(banner as HTMLElement, currentSettings);
+        // If we found the inner banner element, we want to hide its parent section
+        const section = banner.closest('ytd-rich-section-renderer');
+        if (section) {
+            processBannerElement(section as HTMLElement, currentSettings);
+        } else {
+            processBannerElement(banner as HTMLElement, currentSettings);
+        }
     });
 };
 

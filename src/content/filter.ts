@@ -8,6 +8,7 @@ export interface Settings {
     enableLiveFilter: boolean;
     enableBannerFilter: boolean;
     enableMixFilter: boolean;
+    enableShortsFilter: boolean;
 }
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {
@@ -19,12 +20,17 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
     const titleElement = element.querySelector('#video-title') ||
         element.querySelector('#video-title-link') ||
         element.querySelector('.yt-lockup-metadata-view-model__title');
-    if (!titleElement) {
-        if (debug) console.log(`TubeFilter [${index}]: Skipped - No title element found`);
+
+    // Special check for Shorts shelf or items which might not have standard video titles
+    const isShortsElement = element.tagName.toLowerCase() === 'ytd-rich-shelf-renderer' ||
+        element.tagName.toLowerCase() === 'ytd-reel-item-renderer';
+
+    if (!titleElement && !isShortsElement) {
+        if (debug) console.log(`TubeFilter [${index}]: Skipped - No title element found`, element.tagName);
         return;
     }
 
-    if (debug) console.log(`TubeFilter [${index}]: Title found: "${titleElement.textContent?.trim()}"`);
+    if (debug) console.log(`TubeFilter [${index}]: Title found: "${titleElement?.textContent?.trim()}"`);
 
     // Identify metadata
     // ytd-video-meta-block is common, but sometimes it's inside other containers
@@ -41,12 +47,12 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
         metaBlock = element.querySelector('yt-content-metadata-view-model');
     }
 
-    if (!metaBlock) {
+    if (!metaBlock && !isShortsElement) {
         if (debug) console.log(`TubeFilter [${index}]: Skipped - No metadata block found`);
         return;
     }
 
-    const spans = metaBlock.querySelectorAll('span');
+    const spans = metaBlock ? metaBlock.querySelectorAll('span') : [];
     if (debug) console.log(`TubeFilter [${index}]: Found ${spans.length} spans in metadata`);
     let viewCountText = '';
     let isStream = false;
@@ -90,9 +96,22 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
         if (debug) console.log(`TubeFilter [${index}]: Mix list detected`);
     }
 
+    // Check for Shorts
+    let isShorts = false;
+    const shortsLink = element.querySelector('a[href*="/shorts/"]');
+    const shortsOverlay = element.querySelector('ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"]');
+    if (shortsLink || shortsOverlay || element.tagName.toLowerCase() === 'ytd-reel-item-renderer' || element.tagName.toLowerCase() === 'ytd-rich-shelf-renderer') {
+        isShorts = true;
+        if (debug) console.log(`TubeFilter [${index}]: Shorts detected`);
+    }
+
     let shouldFilter = false;
 
-    if (isMix) {
+    if (isShorts) {
+        if (settings.enableShortsFilter) {
+            shouldFilter = true;
+        }
+    } else if (isMix) {
         if (settings.enableMixFilter) {
             shouldFilter = true;
         }
@@ -108,7 +127,7 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
 
     // Apply filter
     if (shouldFilter) {
-        console.log(`TubeFilter [${index}]: FILTERED (Mix: ${isMix}, Views: ${views}, Min: ${isStream ? settings.minConcurrent : settings.minViews})`);
+        console.log(`TubeFilter [${index}]: FILTERED (Shorts: ${isShorts}, Mix: ${isMix}, Views: ${views}, Min: ${isStream ? settings.minConcurrent : settings.minViews})`);
         if (settings.filterMode === 'hide') {
             element.style.display = 'none';
         } else {

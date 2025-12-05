@@ -8,6 +8,7 @@ interface Settings {
   enableLiveFilter: boolean
   enableBannerFilter: boolean
   enableMixFilter: boolean
+  enableShortsFilter: boolean
 }
 
 const defaultSettings: Settings = {
@@ -18,6 +19,7 @@ const defaultSettings: Settings = {
   enableLiveFilter: true,
   enableBannerFilter: true,
   enableMixFilter: true,
+  enableShortsFilter: true,
 }
 
 function App() {
@@ -143,6 +145,22 @@ function App() {
               <div
                 className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
                   settings.enableMixFilter ? 'left-6' : 'left-1'
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="font-medium text-gray-300">Hide Shorts</label>
+            <button
+              onClick={() => setSettings({ ...settings, enableShortsFilter: !settings.enableShortsFilter })}
+              className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${
+                settings.enableShortsFilter ? 'bg-red-600' : 'bg-gray-700'
+              }`}
+              title={settings.enableShortsFilter ? 'Show Shorts' : 'Hide Shorts'}
+            >
+              <div
+                className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
+                  settings.enableShortsFilter ? 'left-6' : 'left-1'
                 }`}
               />
             </button>
