@@ -36,8 +36,8 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 const runFilter = () => {
-    const BUILD_TIMESTAMP = '2025-12-05T14:50:00';
-    console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
+    // const BUILD_TIMESTAMP = '2025-12-05T14:50:00';
+    // console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
     const videoSelectors = [
         'ytd-rich-item-renderer', // Home
         'ytd-video-renderer', // Search
@@ -56,14 +56,14 @@ const runFilter = () => {
     ];
 
     const videos = document.querySelectorAll(videoSelectors.join(','));
-    console.log(`TubeFilter: Found ${videos.length} video elements`);
+    // console.log(`TubeFilter: Found ${videos.length} video elements`);
 
     videos.forEach((video, index) => {
         processVideoElement(video as HTMLElement, currentSettings, index);
     });
 
     const banners = document.querySelectorAll(bannerSelectors.join(','));
-    console.log(`TubeFilter: Found ${banners.length} banner elements`);
+    // console.log(`TubeFilter: Found ${banners.length} banner elements`);
 
     banners.forEach((banner) => {
         // If we found the inner banner element, we want to hide its parent section
