@@ -36,7 +36,7 @@ chrome.storage.onChanged.addListener((changes) => {
 });
 
 const runFilter = () => {
-    const BUILD_TIMESTAMP = '2025-12-05T15:55:00';
+    const BUILD_TIMESTAMP = '2025-12-05T16:10:00';
     console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
 
     const videoSelectors = [
@@ -51,6 +51,8 @@ const runFilter = () => {
 
     const bannerSelectors = [
         '#masthead-ad',
+        '#big-yoodle', // New banner container
+        'ytd-statement-banner-renderer', // Specific banner renderer
         'ytd-rich-section-renderer > #content > ytd-statement-banner-renderer',
         'ytd-rich-section-renderer > #content > ytd-banner-promo-renderer-background',
         'ytd-banner-promo-renderer', // General promo banner
@@ -68,6 +70,11 @@ const runFilter = () => {
 
     const banners = document.querySelectorAll(bannerSelectors.join(','));
     console.log(`TubeFilter: Found ${banners.length} banner elements`);
+    if (document.querySelector('#big-yoodle')) {
+        console.log('TubeFilter: #big-yoodle FOUND in DOM');
+    } else {
+        console.log('TubeFilter: #big-yoodle NOT found in DOM');
+    }
 
     banners.forEach((banner) => {
         // If we found the inner banner element, we want to hide its parent section
