@@ -7,6 +7,7 @@ const defaultSettings: Settings = {
     enableVideoFilter: true,
     enableLiveFilter: true,
     enableBannerFilter: true,
+    enableMixFilter: true,
 };
 
 let currentSettings: Settings = defaultSettings;
@@ -26,17 +27,19 @@ chrome.storage.onChanged.addListener((changes) => {
     if (changes.enableVideoFilter) currentSettings.enableVideoFilter = changes.enableVideoFilter.newValue as boolean;
     if (changes.enableLiveFilter) currentSettings.enableLiveFilter = changes.enableLiveFilter.newValue as boolean;
     if (changes.enableBannerFilter) currentSettings.enableBannerFilter = changes.enableBannerFilter.newValue as boolean;
+    if (changes.enableMixFilter) currentSettings.enableMixFilter = changes.enableMixFilter.newValue as boolean;
     runFilter();
 });
 
 const runFilter = () => {
-    const BUILD_TIMESTAMP = '2025-12-05T14:25:00';
+    const BUILD_TIMESTAMP = '2025-12-05T14:30:00';
     console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
     const videoSelectors = [
         'ytd-rich-item-renderer', // Home
         'ytd-video-renderer', // Search
         'ytd-compact-video-renderer', // Sidebar
-        'ytd-grid-video-renderer' // Channel
+        'ytd-grid-video-renderer', // Channel
+        'ytd-radio-renderer' // Mix lists
     ];
 
     const bannerSelectors = [

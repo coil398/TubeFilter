@@ -7,6 +7,7 @@ interface Settings {
   enableVideoFilter: boolean
   enableLiveFilter: boolean
   enableBannerFilter: boolean
+  enableMixFilter: boolean
 }
 
 const defaultSettings: Settings = {
@@ -16,6 +17,7 @@ const defaultSettings: Settings = {
   enableVideoFilter: true,
   enableLiveFilter: true,
   enableBannerFilter: true,
+  enableMixFilter: true,
 }
 
 function App() {
@@ -125,6 +127,22 @@ function App() {
               <div
                 className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
                   settings.enableBannerFilter ? 'left-6' : 'left-1'
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="font-medium text-gray-300">Hide Mix Lists</label>
+            <button
+              onClick={() => setSettings({ ...settings, enableMixFilter: !settings.enableMixFilter })}
+              className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${
+                settings.enableMixFilter ? 'bg-red-600' : 'bg-gray-700'
+              }`}
+              title={settings.enableMixFilter ? 'Show Mixes' : 'Hide Mixes'}
+            >
+              <div
+                className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
+                  settings.enableMixFilter ? 'left-6' : 'left-1'
                 }`}
               />
             </button>

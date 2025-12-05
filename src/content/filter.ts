@@ -7,6 +7,7 @@ export interface Settings {
     enableVideoFilter: boolean;
     enableLiveFilter: boolean;
     enableBannerFilter: boolean;
+    enableMixFilter: boolean;
 }
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {
@@ -78,9 +79,24 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
     const views = parseViewCount(viewCountText);
     if (debug) console.log(`TubeFilter [${index}]: Parsed views: ${views} from "${viewCountText}" (Live: ${isStream})`);
 
+    // Check for Mix list
+    let isMix = false;
+    const radioLink = element.querySelector('a[href*="start_radio=1"], a[href*="list=RD"]');
+    const mixBadge = element.querySelector('ytd-thumbnail-overlay-bottom-panel-renderer[overlay-style="MIX"]');
+    // Also check for "Mix" text in title if it's a radio renderer (though we are processing generic elements)
+    // Or if the element itself is a radio renderer (which might be passed here)
+    if (radioLink || mixBadge || element.tagName.toLowerCase() === 'ytd-radio-renderer') {
+        isMix = true;
+        if (debug) console.log(`TubeFilter [${index}]: Mix list detected`);
+    }
+
     let shouldFilter = false;
 
-    if (isStream) {
+    if (isMix) {
+        if (settings.enableMixFilter) {
+            shouldFilter = true;
+        }
+    } else if (isStream) {
         if (settings.enableLiveFilter && views !== null && views < settings.minConcurrent) {
             shouldFilter = true;
         }
@@ -92,7 +108,7 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
 
     // Apply filter
     if (shouldFilter) {
-        console.log(`TubeFilter [${index}]: FILTERED (Views: ${views}, Min: ${isStream ? settings.minConcurrent : settings.minViews})`);
+        console.log(`TubeFilter [${index}]: FILTERED (Mix: ${isMix}, Views: ${views}, Min: ${isStream ? settings.minConcurrent : settings.minViews})`);
         if (settings.filterMode === 'hide') {
             element.style.display = 'none';
         } else {
