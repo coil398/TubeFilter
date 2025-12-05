@@ -9,6 +9,7 @@ export interface Settings {
     enableBannerFilter: boolean;
     enableMixFilter: boolean;
     enableShortsFilter: boolean;
+    language: 'ja' | 'en';
 }
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {

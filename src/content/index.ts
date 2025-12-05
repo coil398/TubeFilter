@@ -9,6 +9,7 @@ const defaultSettings: Settings = {
     enableBannerFilter: true,
     enableMixFilter: true,
     enableShortsFilter: true,
+    language: 'ja',
 };
 
 let currentSettings: Settings = defaultSettings;
@@ -30,11 +31,12 @@ chrome.storage.onChanged.addListener((changes) => {
     if (changes.enableBannerFilter) currentSettings.enableBannerFilter = changes.enableBannerFilter.newValue as boolean;
     if (changes.enableMixFilter) currentSettings.enableMixFilter = changes.enableMixFilter.newValue as boolean;
     if (changes.enableShortsFilter) currentSettings.enableShortsFilter = changes.enableShortsFilter.newValue as boolean;
+    if (changes.language) currentSettings.language = changes.language.newValue as 'ja' | 'en';
     runFilter();
 });
 
 const runFilter = () => {
-    const BUILD_TIMESTAMP = '2025-12-05T14:45:00';
+    const BUILD_TIMESTAMP = '2025-12-05T14:50:00';
     console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
     const videoSelectors = [
         'ytd-rich-item-renderer', // Home
