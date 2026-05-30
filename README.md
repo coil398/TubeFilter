@@ -1,4 +1,3 @@
-# React + TypeScript + Vite
 # TubeFilter
 
 TubeFilter is a Chrome Extension that filters YouTube videos based on view counts and concurrent viewers. It helps you declutter your feed by hiding videos with low engagement or specific types of content you want to avoid.
@@ -56,7 +55,6 @@ TubeFilter is a Chrome Extension that filters YouTube videos based on view count
 -   [TypeScript](https://www.typescriptlang.org/)
 -   [Tailwind CSS](https://tailwindcss.com/)
 -   [CRXJS](https://crxjs.dev/vite-plugin)
- & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
 ## Expanding the ESLint configuration
 

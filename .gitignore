@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Tooling caches
+.serena/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
