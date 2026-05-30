@@ -67,17 +67,33 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
     }
 
     // Iterate spans to find view count pattern
+    let foundViewCount = false;
     for (const span of spans) {
-        const text = span.textContent || '';
+        const text = span.textContent?.trim() || '';
         if (debug) console.log(`TubeFilter [${index}]: Checking span text: "${text}"`);
-        // console.log('TubeFilter: Checking text:', text);
-        if (isLive(text)) {
-            isStream = true;
+
+        // Skip if it looks like a date
+        if (text.includes('ago') || text.includes('前')) continue;
+
+        // Check for specific view count keywords
+        if (/(views|view|回視聴|視聴|watching|人|人が視聴中)/i.test(text)) {
             viewCountText = text;
+            if (isLive(text)) isStream = true;
+            foundViewCount = true;
             break;
         }
-        if (/\d/.test(text)) {
-            if (!text.includes('ago') && !text.includes('前')) {
+    }
+
+    // Fallback: if no keyword found, look for strict number patterns
+    if (!foundViewCount) {
+        for (const span of spans) {
+            const text = span.textContent?.trim() || '';
+            if (debug) console.log(`TubeFilter [${index}]: Checking fallback text: "${text}"`);
+            if (text.includes('ago') || text.includes('前')) continue;
+
+            // Strict number pattern: digits, commas, dots, optional K/M/B/万/億 suffix
+            // And NO other characters (except whitespace)
+            if (/^[\d,.]+\s*[KMB万億]?$/i.test(text)) {
                 viewCountText = text;
                 break;
             }
