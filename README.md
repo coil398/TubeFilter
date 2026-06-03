@@ -2,7 +2,7 @@
 
 [English](./README.md) · [日本語](./README.ja.md) · [Español](./README.es.md) · [Português](./README.pt.md) · [Deutsch](./README.de.md) · [Français](./README.fr.md) · [Русский](./README.ru.md) · [한국어](./README.ko.md) · [简体中文](./README.zh.md)
 
-**TubeFilter** is a cross-browser Manifest V3 extension that cleans up your YouTube feed by filtering content against view-count and live-viewer thresholds you control. It dims or hides low-view videos and low-viewer live streams, and can independently strip out promotional top banners, Mix lists, and Shorts. Settings live in a React popup, apply instantly to open YouTube tabs with no reload, and the popup UI is available in Japanese and English (plus an **Auto** mode that follows your browser language). View/viewer counts are parsed in a locale-aware way across **9 YouTube page languages**.
+**TubeFilter** is a cross-browser Manifest V3 extension that cleans up your YouTube feed by filtering content against view-count and live-viewer thresholds you control. It dims or hides low-view videos and low-viewer live streams, and can independently strip out promotional top banners, Mix lists, and Shorts. Settings live in a React popup, apply instantly to open YouTube tabs with no reload, and the popup UI is available in **9 languages** (English, 日本語, Español, Português, Deutsch, Français, Русский, 한국어, 简体中文) with an **Auto** mode that follows your browser language. View/viewer counts are parsed in a locale-aware way across the same **9 YouTube page languages**.
 
 [![WXT](https://img.shields.io/badge/WXT-0.20.26-67D8EF)](https://wxt.dev/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -98,11 +98,13 @@ The content script auto-detects the **YouTube page language** (`document.documen
 
 ### Languages (popup UI)
 
-The popup UI is offered in **Japanese (`ja`)** and **English (`en`)**, with a third **Auto (`auto`, default)** mode that follows the browser UI language (`navigator.language`): if the browser language starts with `ja`, the UI renders in Japanese, otherwise in English. A three-button control in the popup header (`Auto` / `日本語` / `EN`) switches between them, with the active choice highlighted.
+The popup UI is offered in **9 languages** — English, 日本語, Español, Português, Deutsch, Français, Русский, 한국어, 简体中文 — plus an **Auto (`auto`, default)** mode that follows the browser UI language (`navigator.language`, mapped to the closest supported locale, falling back to English). A dropdown in the popup header switches between them.
 
 ## Screenshots
 
-> 📷 _TODO: add a popup screenshot and a before/after of a filtered feed (Hide vs. Opacity). No screenshots are committed yet._
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## Supported browsers
 
@@ -149,7 +151,7 @@ Open the extension popup to adjust filtering. Changes are saved immediately and 
 | `enableBannerFilter` | Hide promotional top banners | on/off toggle | `true` | トップバナー非表示 | Hide Top Banner |
 | `enableMixFilter` | Hide Mix lists | on/off toggle | `true` | ミックスリスト非表示 | Hide Mix Lists |
 | `enableShortsFilter` | Hide Shorts | on/off toggle | `true` | ショート動画非表示 | Hide Shorts |
-| `language` | Popup UI language (`auto` / `ja` / `en`); **Auto** follows the browser UI language (`navigator.language`) | three-button selector (`Auto` / `日本語` / `EN`) | `auto` | Language | 言語 |
+| `language` | Popup UI language: `auto` + 9 locales (`en`/`ja`/`es`/`pt`/`de`/`fr`/`ru`/`ko`/`zh`); **Auto** follows the browser UI language (`navigator.language`) | dropdown selector | `auto` | Language | 言語 |
 
 Both sliders show their value thousands-separated via `toLocaleString()`. A helper note sits beneath the Min Concurrent slider:
 
@@ -162,7 +164,7 @@ A two-button control. **Hide** sets `filterMode = 'hide'`; **Opacity** sets `fil
 
 ### Language selector
 
-A three-button control in the popup header sets `language` to one of `auto`, `ja`, or `en`. The buttons read **Auto** / **日本語** / **EN**, and the active choice is highlighted. **Auto** (the default) resolves the effective UI language from `navigator.language`: a browser language starting with `ja` renders the UI in Japanese, anything else renders it in English. Selecting **日本語** or **EN** pins the UI to that language regardless of the browser setting.
+A dropdown in the popup header sets `language` to `auto` or one of the 9 locales (`en`/`ja`/`es`/`pt`/`de`/`fr`/`ru`/`ko`/`zh`). **Auto** (the default) resolves the effective UI language from `navigator.language`, mapped to the closest supported locale and falling back to English. Selecting a specific language pins the UI to it regardless of the browser setting.
 
 ## How it works
 

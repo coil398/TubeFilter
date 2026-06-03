@@ -18,6 +18,12 @@ export default defineConfig({
     browser_specific_settings: {
       gecko: {
         id: 'tube-filter@coil398.github.io',
+        // Firefox (AMO) requires a data-collection declaration for new
+        // extensions since 2025-11-03. TubeFilter collects nothing — it only
+        // reads YouTube DOM and stores settings locally — so declare "none".
+        data_collection_permissions: {
+          required: ['none'],
+        },
       },
     },
   },

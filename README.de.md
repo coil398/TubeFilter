@@ -87,7 +87,9 @@ Die Popup-Oberfläche wird auf **Japanisch (`ja`)** und **Englisch (`en`)** ange
 
 ## Screenshots
 
-> 📷 _TODO: einen Popup-Screenshot sowie ein Vorher/Nachher eines gefilterten Feeds (Hide vs. Opacity) hinzufügen. Es sind noch keine Screenshots eingecheckt._
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## Unterstützte Browser
 

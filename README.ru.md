@@ -87,7 +87,9 @@ YouTube отображает количество просмотров и зри
 
 ## Скриншоты
 
-> 📷 _TODO: добавить скриншот всплывающего окна и пример «до/после» отфильтрованной ленты (Hide или Opacity). Скриншоты пока не закоммичены._
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## Поддерживаемые браузеры
 

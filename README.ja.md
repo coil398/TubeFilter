@@ -87,7 +87,9 @@ YouTube は再生回数・視聴者数を **ページ言語ごとに大きく異
 
 ## スクリーンショット
 
-> 📷 _TODO: ポップアップのスクリーンショットと、フィルタリングされたフィードのビフォー/アフター（Hide と Opacity）を追加する。スクリーンショットはまだコミットされていません。_
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## 対応ブラウザ
 

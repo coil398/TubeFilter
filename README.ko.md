@@ -87,7 +87,9 @@ YouTube는 조회수와 시청자 수를 **페이지 언어별로 매우 다르�
 
 ## 스크린샷
 
-> 📷 _TODO: 팝업 스크린샷과 필터링된 피드의 전후 비교(Hide vs. Opacity)를 추가하세요. 아직 커밋된 스크린샷이 없습니다._
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## 지원 브라우저
 

@@ -87,7 +87,9 @@ YouTube **在每种页面语言下渲染观看数和观众数的方式都大不�
 
 ## 截图
 
-> 📷 _TODO：添加一张弹窗截图，以及一张过滤前后信息流的对比图（Hide 与 Opacity）。目前尚未提交任何截图。_
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## 支持的浏览器
 

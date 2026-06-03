@@ -1,23 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { Settings } from '@/utils/types'
 import { defaultSettings, loadSettings, saveSettings } from '@/utils/storage'
+import { detectLang, type LangKey } from '@/utils/locales'
 
 const translations = {
-  ja: {
-    title: 'TubeFilter 設定',
-    minViews: '最低再生回数',
-    minConcurrent: '最低同時接続数 (ライブ)',
-    filterMode: 'フィルタリングモード',
-    modeHide: '非表示',
-    modeOpacity: '薄く表示',
-    enableVideoFilter: '動画フィルタ有効',
-    enableLiveFilter: 'ライブフィルタ有効',
-    hideTopBanner: 'トップバナー非表示',
-    hideMixLists: 'ミックスリスト非表示',
-    hideShorts: 'ショート動画非表示',
-    liveStreamNote: '視聴者数が少ないライブ配信はフィルタリングされます。',
-    language: '言語',
-  },
   en: {
     title: 'TubeFilter Settings',
     minViews: 'Min Views',
@@ -33,6 +19,126 @@ const translations = {
     liveStreamNote: 'Live streams with fewer viewers will be filtered.',
     language: 'Language',
   },
+  ja: {
+    title: 'TubeFilter 設定',
+    minViews: '最低再生回数',
+    minConcurrent: '最低同時接続数 (ライブ)',
+    filterMode: 'フィルタリングモード',
+    modeHide: '非表示',
+    modeOpacity: '薄く表示',
+    enableVideoFilter: '動画フィルタ有効',
+    enableLiveFilter: 'ライブフィルタ有効',
+    hideTopBanner: 'トップバナー非表示',
+    hideMixLists: 'ミックスリスト非表示',
+    hideShorts: 'ショート動画非表示',
+    liveStreamNote: '視聴者数が少ないライブ配信はフィルタリングされます。',
+    language: '言語',
+  },
+  es: {
+    title: 'Configuración de TubeFilter',
+    minViews: 'Vistas mínimas',
+    minConcurrent: 'Espectadores mínimos (en directo)',
+    filterMode: 'Modo de filtro',
+    modeHide: 'Ocultar',
+    modeOpacity: 'Atenuar',
+    enableVideoFilter: 'Activar filtro de vídeos',
+    enableLiveFilter: 'Activar filtro de directos',
+    hideTopBanner: 'Ocultar banner superior',
+    hideMixLists: 'Ocultar listas de mezclas',
+    hideShorts: 'Ocultar Shorts',
+    liveStreamNote: 'Se filtrarán los directos con menos espectadores.',
+    language: 'Idioma',
+  },
+  pt: {
+    title: 'Configurações do TubeFilter',
+    minViews: 'Mín. de visualizações',
+    minConcurrent: 'Mín. de espectadores (ao vivo)',
+    filterMode: 'Modo de filtragem',
+    modeHide: 'Ocultar',
+    modeOpacity: 'Esmaecer',
+    enableVideoFilter: 'Ativar filtro de vídeos',
+    enableLiveFilter: 'Ativar filtro ao vivo',
+    hideTopBanner: 'Ocultar banner superior',
+    hideMixLists: 'Ocultar listas Mix',
+    hideShorts: 'Ocultar Shorts',
+    liveStreamNote: 'Transmissões ao vivo com menos espectadores serão filtradas.',
+    language: 'Idioma',
+  },
+  de: {
+    title: 'TubeFilter Einstellungen',
+    minViews: 'Min. Aufrufe',
+    minConcurrent: 'Min. Zuschauer (Live)',
+    filterMode: 'Filtermodus',
+    modeHide: 'Ausblenden',
+    modeOpacity: 'Abdunkeln',
+    enableVideoFilter: 'Videofilter aktivieren',
+    enableLiveFilter: 'Livefilter aktivieren',
+    hideTopBanner: 'Top-Banner ausblenden',
+    hideMixLists: 'Mix-Listen ausblenden',
+    hideShorts: 'Shorts ausblenden',
+    liveStreamNote: 'Livestreams mit wenigen Zuschauern werden gefiltert.',
+    language: 'Sprache',
+  },
+  fr: {
+    title: 'Paramètres TubeFilter',
+    minViews: 'Vues minimum',
+    minConcurrent: 'Spectateurs min. (Live)',
+    filterMode: 'Mode de filtrage',
+    modeHide: 'Masquer',
+    modeOpacity: 'Atténuer',
+    enableVideoFilter: 'Activer le filtre vidéo',
+    enableLiveFilter: 'Activer le filtre live',
+    hideTopBanner: 'Masquer la bannière',
+    hideMixLists: 'Masquer les mix',
+    hideShorts: 'Masquer les Shorts',
+    liveStreamNote: 'Les directs avec peu de spectateurs seront filtrés.',
+    language: 'Langue',
+  },
+  ru: {
+    title: 'TubeFilter — Настройки',
+    minViews: 'Мин. просмотров',
+    minConcurrent: 'Мин. зрителей (трансляция)',
+    filterMode: 'Режим фильтра',
+    modeHide: 'Скрыть',
+    modeOpacity: 'Затемнить',
+    enableVideoFilter: 'Включить фильтр видео',
+    enableLiveFilter: 'Включить фильтр трансляций',
+    hideTopBanner: 'Скрыть верхний баннер',
+    hideMixLists: 'Скрыть Микс-плейлисты',
+    hideShorts: 'Скрыть Shorts',
+    liveStreamNote: 'Трансляции с малым числом зрителей будут отфильтрованы.',
+    language: 'Язык',
+  },
+  ko: {
+    title: 'TubeFilter 설정',
+    minViews: '최소 조회수',
+    minConcurrent: '최소 동시 시청자 (라이브)',
+    filterMode: '필터 모드',
+    modeHide: '숨기기',
+    modeOpacity: '흐리게',
+    enableVideoFilter: '동영상 필터 사용',
+    enableLiveFilter: '라이브 필터 사용',
+    hideTopBanner: '상단 배너 숨기기',
+    hideMixLists: '믹스 목록 숨기기',
+    hideShorts: '쇼츠 숨기기',
+    liveStreamNote: '시청자 수가 적은 라이브 방송은 필터링됩니다.',
+    language: '언어',
+  },
+  zh: {
+    title: 'TubeFilter 设置',
+    minViews: '最低播放量',
+    minConcurrent: '最低同时在线数（直播）',
+    filterMode: '过滤模式',
+    modeHide: '隐藏',
+    modeOpacity: '半透明',
+    enableVideoFilter: '启用视频过滤',
+    enableLiveFilter: '启用直播过滤',
+    hideTopBanner: '隐藏顶部横幅',
+    hideMixLists: '隐藏合辑列表',
+    hideShorts: '隐藏 Shorts',
+    liveStreamNote: '观看人数较少的直播将被过滤。',
+    language: '语言',
+  },
 }
 
 function App() {
@@ -46,10 +152,11 @@ function App() {
     void saveSettings(settings)
   }, [settings])
 
-  // Effective UI language: 'auto' follows the browser UI language (navigator.language).
-  const uiLang: 'ja' | 'en' =
+  // Effective UI language: 'auto' follows the browser UI language (navigator.language),
+  // mapped to one of the 9 supported locales (falling back to English).
+  const uiLang: LangKey =
     settings.language === 'auto'
-      ? (navigator.language.toLowerCase().startsWith('ja') ? 'ja' : 'en')
+      ? (detectLang(navigator.language) ?? 'en')
       : settings.language
 
   const t = (key: keyof typeof translations.ja) => {
@@ -65,23 +172,23 @@ function App() {
           </svg>
           {t('title')}
         </h1>
-        <div className="flex items-center gap-1" role="group" aria-label={t('language')}>
-          {(['auto', 'ja', 'en'] as const).map((lng) => (
-            <button
-              key={lng}
-              onClick={() => setSettings({ ...settings, language: lng })}
-              aria-pressed={settings.language === lng}
-              className={`text-xs px-2 py-1 rounded border transition-colors ${
-                settings.language === lng
-                  ? 'bg-red-600 border-red-600 text-white'
-                  : 'bg-gray-800 hover:bg-gray-700 border-gray-600 text-gray-300'
-              }`}
-              title={lng === 'auto' ? 'Auto (follow browser language)' : lng === 'ja' ? '日本語' : 'English'}
-            >
-              {lng === 'auto' ? 'Auto' : lng === 'ja' ? '日本語' : 'EN'}
-            </button>
-          ))}
-        </div>
+        <select
+          value={settings.language}
+          onChange={(e) => setSettings({ ...settings, language: e.target.value as Settings['language'] })}
+          aria-label={t('language')}
+          className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-600 rounded px-2 py-1 cursor-pointer focus:outline-none focus:ring-1 focus:ring-red-500"
+        >
+          <option value="auto">Auto</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="ru">Русский</option>
+          <option value="ko">한국어</option>
+          <option value="zh">简体中文</option>
+        </select>
       </div>
 
       <div className="space-y-6">

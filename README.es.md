@@ -87,7 +87,9 @@ La interfaz del popup se ofrece en **japonés (`ja`)** e **inglés (`en`)**, con
 
 ## Capturas de pantalla
 
-> 📷 _TODO: añadir una captura del popup y un antes/después de un feed filtrado (Ocultar vs. Opacidad). Todavía no se ha incluido ninguna captura._
+| English | 日本語 |
+|---|---|
+| ![TubeFilter popup (English)](./docs/screenshots/popup-en.png) | ![TubeFilter popup (Japanese)](./docs/screenshots/popup-ja.png) |
 
 ## Navegadores compatibles
 
