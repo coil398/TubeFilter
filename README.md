@@ -1,6 +1,8 @@
 # TubeFilter
 
-**TubeFilter** is a cross-browser Manifest V3 extension that cleans up your YouTube feed by filtering content against view-count and live-viewer thresholds you control. It dims or hides low-view videos and low-viewer live streams, and can independently strip out promotional top banners, Mix lists, and Shorts. Settings live in a React popup, apply instantly to open YouTube tabs with no reload, and are available in Japanese and English.
+[English](./README.md) · [日本語](./README.ja.md) · [Español](./README.es.md) · [Português](./README.pt.md) · [Deutsch](./README.de.md) · [Français](./README.fr.md) · [Русский](./README.ru.md) · [한국어](./README.ko.md) · [简体中文](./README.zh.md)
+
+**TubeFilter** is a cross-browser Manifest V3 extension that cleans up your YouTube feed by filtering content against view-count and live-viewer thresholds you control. It dims or hides low-view videos and low-viewer live streams, and can independently strip out promotional top banners, Mix lists, and Shorts. Settings live in a React popup, apply instantly to open YouTube tabs with no reload, and the popup UI is available in Japanese and English (plus an **Auto** mode that follows your browser language). View/viewer counts are parsed in a locale-aware way across **9 YouTube page languages**.
 
 [![WXT](https://img.shields.io/badge/WXT-0.20.26-67D8EF)](https://wxt.dev/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -80,9 +82,23 @@ Each card is classified once, using a fixed if/else order. Only the first matchi
 3. **Live streams**
 4. **Regular videos**
 
-### Languages
+### Multi-language view-count detection
 
-The popup UI ships in **Japanese (`ja`, default)** and **English (`en`)**, toggled from the header. The button reads **English** while the current language is Japanese, and **日本語** while the current language is English.
+YouTube renders view and viewer counts **very differently per page language** — not just translated words, but different decimal/thousand separators and abbreviation units. The same ~1.7-billion count appears as:
+
+| Language | YouTube string |
+|---|---|
+| English | `1.7B` |
+| Deutsch | `1,7 Mrd.` |
+| 日本語 | `17億` |
+| Русский | `1,7 млрд` |
+| 简体中文 | `17亿` |
+
+The content script auto-detects the **YouTube page language** (`document.documentElement.lang`) and parses counts with the correct decimal separator, thousands separator, and abbreviation units for that locale. This matters because the previous parser assumed an English-style format and **mis-read comma-decimal locales** (`de` / `fr` / `ru` / `pt`) — e.g. reading `1,7 Mrd.` as `1` or `17` instead of `1,700,000,000`. Locale-correct parsing is supported for **9 languages** (see [Internationalization](#internationalization)); unknown page languages fall back to a permissive generic parser.
+
+### Languages (popup UI)
+
+The popup UI is offered in **Japanese (`ja`)** and **English (`en`)**, with a third **Auto (`auto`, default)** mode that follows the browser UI language (`navigator.language`): if the browser language starts with `ja`, the UI renders in Japanese, otherwise in English. A three-button control in the popup header (`Auto` / `日本語` / `EN`) switches between them, with the active choice highlighted.
 
 ## Screenshots
 
@@ -133,7 +149,7 @@ Open the extension popup to adjust filtering. Changes are saved immediately and 
 | `enableBannerFilter` | Hide promotional top banners | on/off toggle | `true` | トップバナー非表示 | Hide Top Banner |
 | `enableMixFilter` | Hide Mix lists | on/off toggle | `true` | ミックスリスト非表示 | Hide Mix Lists |
 | `enableShortsFilter` | Hide Shorts | on/off toggle | `true` | ショート動画非表示 | Hide Shorts |
-| `language` | Popup UI language (`ja` / `en`) | header toggle button | `ja` | Language | 言語 |
+| `language` | Popup UI language (`auto` / `ja` / `en`); **Auto** follows the browser UI language (`navigator.language`) | three-button selector (`Auto` / `日本語` / `EN`) | `auto` | Language | 言語 |
 
 Both sliders show their value thousands-separated via `toLocaleString()`. A helper note sits beneath the Min Concurrent slider:
 
@@ -144,15 +160,16 @@ Both sliders show their value thousands-separated via `toLocaleString()`. A help
 
 A two-button control. **Hide** sets `filterMode = 'hide'`; **Opacity** sets `filterMode = 'opacity'`. The active mode is highlighted. Labels are localized — JA: 非表示 / 薄く表示, EN: Hide / Opacity.
 
-### Language toggle
+### Language selector
 
-A single button in the popup header flips `language` between `ja` and `en`. It shows **English** when the current language is Japanese, and **日本語** when the current language is English.
+A three-button control in the popup header sets `language` to one of `auto`, `ja`, or `en`. The buttons read **Auto** / **日本語** / **EN**, and the active choice is highlighted. **Auto** (the default) resolves the effective UI language from `navigator.language`: a browser language starting with `ja` renders the UI in Japanese, anything else renders it in English. Selecting **日本語** or **EN** pins the UI to that language regardless of the browser setting.
 
 ## How it works
 
 ### Content script
 
 - **Match & timing** — matches `https://www.youtube.com/*` and runs at `run_at: document_end`.
+- **Page-language detection** — on every pass it reads `document.documentElement.lang` (falling back to `navigator.language`, then `'en'`) and uses it to pick a locale-correct view-count parser (see [Internationalization](#internationalization)).
 - **Targets** — scans 7 video selectors covering Home (`ytd-rich-item-renderer`), Search (`ytd-video-renderer`), Sidebar (`ytd-compact-video-renderer`), Channel (`ytd-grid-video-renderer`), Mix lists (`ytd-radio-renderer`), individual Shorts (`ytd-reel-item-renderer`), and the Shorts shelf (`ytd-rich-shelf-renderer`); plus 9 banner selectors (`#masthead-ad`, `#big-yoodle`, `ytd-statement-banner-renderer`, `ytd-banner-promo-renderer`, `ytd-ad-slot-renderer`, `ytd-in-feed-ad-layout-renderer`, and several `ytd-rich-section-renderer > #content > …` variants).
 - **Dynamic feed handling** — a `MutationObserver` watches `document.body` with `{ childList: true, subtree: true }`. When nodes are added, it debounces with a **500 ms** `setTimeout` (clearing and re-arming the timer on each batch), so the filter runs 500 ms after the last burst of added nodes. The filter also runs once on initial load and once right after settings load.
 
@@ -162,11 +179,31 @@ A single button in the popup header flips `language` between `ja` and `en`. It s
 
 <a id="live-detection"></a>
 
-Live status is detected from DOM badges (`.badge-style-type-live-now`, `.badge-style-type-live-now-alternate`, `[overlay-style="LIVE"]`) or from the view-count text itself (case-insensitively containing `視聴中`, `watching`, `live`, or `ライブ`).
+Live status is detected from DOM badges (`.badge-style-type-live-now`, `.badge-style-type-live-now-alternate`, `[overlay-style="LIVE"]`) or from the view-count text itself (case-insensitively containing `視聴中`, `watching`, `live`, or `ライブ`, plus the active page locale's own live keywords — see [Internationalization](#internationalization)).
+
+<a id="internationalization"></a>
+
+### Internationalization
+
+YouTube formats view/viewer counts differently in every UI language, so count parsing is driven by the **detected YouTube page language**, not by the popup UI language. On each pass the content script reads `document.documentElement.lang` (falling back to `navigator.language`, then `'en'`), normalizes it to a base language code (e.g. `zh-Hans-CN` → `zh`, `es-419` → `es`), and selects a per-locale spec describing that language's decimal separator, thousands separator, abbreviation units (e.g. `K`/`M`/`B`, `万`/`億`, `Mio.`/`Mrd.`, `тыс.`/`млн`/`млрд`, `万`/`亿`), "views" connector words, date/past-stream markers, live-stream words, and "no views" → `0` words.
+
+Locale-correct parsing is supported for **9 languages**:
+
+- **English** (`en`)
+- **日本語** (`ja`)
+- **Español** (`es`)
+- **Português** (`pt`)
+- **Deutsch** (`de`)
+- **Français** (`fr`)
+- **Русский** (`ru`)
+- **한국어** (`ko`)
+- **简体中文** (`zh`)
+
+If the page language is none of these, parsing falls back to a **permissive generic spec** that uses a `.` decimal and recognizes a union of common units (`K`/`M`/`B` and the CJK/Korean units) on a best-effort basis. This locale awareness fixes the previous parser's mis-reads of comma-decimal locales (`de` / `fr` / `ru` / `pt`), where `1,7 Mrd.` was read as `1` or `17` instead of `1,700,000,000`.
 
 ### Popup (React)
 
-A React 19 popup (`src/entrypoints/popup/`) renders the sliders, toggles, filter-mode selector, and language toggle. Editing any control writes to storage immediately.
+A React 19 popup (`src/entrypoints/popup/`) renders the sliders, toggles, filter-mode selector, and the three-way language selector. Editing any control writes to storage immediately. The popup resolves its effective display language from `settings.language`: `auto` follows `navigator.language`, while `ja` / `en` pin it.
 
 ### Settings storage & live sync
 
@@ -174,24 +211,22 @@ A React 19 popup (`src/entrypoints/popup/`) renders the sliders, toggles, filter
 - `loadSettings()` calls `browser.storage.local.get(defaultSettings)`, merging stored values over the defaults; `saveSettings()` calls `browser.storage.local.set(settings)`.
 - `watchSettings()` registers a `browser.storage.onChanged` listener. On any change in the `local` area it re-reads the full settings record and re-runs the filter — which is why popup edits apply instantly to open tabs.
 
-The `Settings` type has exactly 9 fields: `minViews`, `minConcurrent`, `filterMode`, `enableVideoFilter`, `enableLiveFilter`, `enableBannerFilter`, `enableMixFilter`, `enableShortsFilter`, `language`.
+The `Settings` type has exactly 9 fields: `minViews`, `minConcurrent`, `filterMode`, `enableVideoFilter`, `enableLiveFilter`, `enableBannerFilter`, `enableMixFilter`, `enableShortsFilter`, `language` (`'auto' | 'ja' | 'en'`, default `'auto'`).
 
 ### View-count parsing
 
-`parseViewCount` normalizes YouTube's varied count strings into a number (or `null`):
+`parseViewCount(text, lang)` resolves the locale spec for the given page language (or the generic spec when the language is unknown/omitted) and normalizes YouTube's varied count strings into a number (or `null`). Across all supported locales it:
 
 | Input pattern | Handling | Example |
 |---|---|---|
-| Japanese unit `万` | × 10,000 | `1.2万` → `12000` |
-| Japanese unit `億` | × 100,000,000 | — |
-| English `K` (case-insensitive) | × 1,000 | `12K` → `12000` |
-| English `M` | × 1,000,000 | — |
-| English `B` | × 1,000,000,000 | — |
-| `No` (e.g. `No views`) or `なし` | returns `0` | `No views` → `0` |
-| Plain numbers | commas stripped, then `parseFloat` | `1,234` → `1234` |
+| Abbreviation units (per locale) | multiplied by the locale's unit factor | `1.2万` → `12000`, `12K` → `12000`, `1,7 Mrd.` (de) → `1700000000` |
+| Locale decimal / thousands separators | comma-decimal locales (`de`/`fr`/`ru`/`pt`) and space-thousands locales (`fr`/`ru`) parsed correctly | `129.069 Aufrufe` (de) → `129069` |
+| "No views" words (e.g. `No views`, `なし`, locale equivalents) | returns `0` | `No views` → `0` |
+| Plain numbers | separators stripped per locale, then parsed | `1,234` (en) → `1234` |
+| Date / past-stream text | treated as "not a count" so the card is left untouched | `2 days ago`, `〜前` |
 | Unparseable | returns `null` (element not filtered by view-count rules) | — |
 
-Before parsing, the words `views` / `view` / `回視聴` / `視聴` / `回` / `watching` / `人` / `人が視聴中` are stripped. The `isLive(text)` helper returns `true` (case-insensitive) when the text contains `視聴中`, `watching`, `live`, or `ライブ`.
+Before parsing, the locale's "views"/connector keywords (e.g. `views` / `view` / `回視聴` / `視聴` / `回` / `de vistas` / `Aufrufe` / `просмотров` / `조회수` / `次观看`) are stripped. Whitespace — including NBSP and narrow-NBSP as they appear in real YouTube strings — is normalized first. The `isLive(text, lang)` helper returns `true` (case-insensitive) when the text contains a universal live marker (`視聴中`, `watching`, `live`, `ライブ`) or one of the active locale's live-stream words.
 
 ## Known limitations
 
@@ -222,8 +257,11 @@ npm ci   # postinstall runs `wxt prepare` to generate WXT-managed types (.wxt/)
 | `zip:firefox` | `wxt zip -b firefox` | Builds and packages the Firefox extension zip in `.output/`. |
 | `compile` | `wxt prepare && tsc --noEmit` | Generates WXT types, then type-checks without emitting. |
 | `lint` | `eslint .` | Lints the whole project (ESLint 9 flat config at `eslint.config.js`). |
+| `test` | `tsx test-parser.ts` | Runs the locale view-count parser tests (`test-parser.ts`), covering view/viewer parsing and live detection across all 9 supported languages. |
 
 > ℹ️ `postinstall` runs `wxt prepare` automatically after `npm install` / `npm ci`.
+
+Run `npm test` after changing anything in `src/utils/locales.ts` or `src/utils/parser.ts` — it asserts real YouTube count strings (including NBSP-separated and comma-decimal forms) parse to the expected numbers for English, 日本語, Español, Português, Deutsch, Français, Русский, 한국어, and 简体中文.
 
 ### Project structure
 
@@ -240,11 +278,13 @@ TubeFilter/
 │   │       └── index.css
 │   └── utils/
 │       ├── filter.ts            # processVideoElement, processBannerElement
-│       ├── parser.ts            # parseViewCount, isLive
+│       ├── parser.ts            # parseViewCount, isLive (locale-aware wrappers)
+│       ├── locales.ts           # per-language LocaleSpec table + generic fallback, detectLang/parseCount
 │       ├── storage.ts           # defaultSettings, loadSettings, watchSettings
 │       └── types.ts             # Settings type
 ├── public/
 │   └── icon/                    # 16.png, 48.png, 128.png
+├── test-parser.ts               # `npm test` — locale parser tests for all 9 languages
 ├── wxt.config.ts                # srcDir: 'src', React module, manifestVersion: 3, manifest fields
 ├── tsconfig.json                # extends .wxt/tsconfig.json
 ├── eslint.config.js
@@ -309,7 +349,8 @@ Contributions are welcome. Before opening a PR:
 1. `npm ci` to install dependencies (this also generates WXT types).
 2. `npm run lint` to check the code with ESLint.
 3. `npm run compile` to type-check (`wxt prepare && tsc --noEmit`).
-4. Test your changes in both targets with `npm run dev` and `npm run dev:firefox`.
+4. `npm test` to run the locale parser tests (especially after touching `src/utils/locales.ts` or `src/utils/parser.ts`).
+5. Test your changes in both targets with `npm run dev` and `npm run dev:firefox`.
 
 ## License
 

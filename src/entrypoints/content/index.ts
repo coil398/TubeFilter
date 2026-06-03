@@ -13,6 +13,10 @@ export default defineContentScript({
             const BUILD_TIMESTAMP = '2025-12-05T16:10:00';
             console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
 
+            // Detect the YouTube page language for locale-aware view-count parsing
+            // (e.g. "1,7 Mrd." in de vs "1.7B" in en vs "17億" in ja).
+            const pageLang = document.documentElement.lang || navigator.language || 'en';
+
             const videoSelectors = [
                 'ytd-rich-item-renderer', // Home
                 'ytd-video-renderer', // Search
@@ -39,7 +43,7 @@ export default defineContentScript({
             console.log(`TubeFilter: Found ${videos.length} video elements`);
 
             videos.forEach((video, index) => {
-                processVideoElement(video as HTMLElement, currentSettings, index);
+                processVideoElement(video as HTMLElement, currentSettings, index, pageLang);
             });
 
             const banners = document.querySelectorAll(bannerSelectors.join(','));

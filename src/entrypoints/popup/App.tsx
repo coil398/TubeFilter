@@ -16,7 +16,7 @@ const translations = {
     hideMixLists: 'ミックスリスト非表示',
     hideShorts: 'ショート動画非表示',
     liveStreamNote: '視聴者数が少ないライブ配信はフィルタリングされます。',
-    language: 'Language',
+    language: '言語',
   },
   en: {
     title: 'TubeFilter Settings',
@@ -31,7 +31,7 @@ const translations = {
     hideMixLists: 'Hide Mix Lists',
     hideShorts: 'Hide Shorts',
     liveStreamNote: 'Live streams with fewer viewers will be filtered.',
-    language: '言語',
+    language: 'Language',
   },
 }
 
@@ -46,8 +46,14 @@ function App() {
     void saveSettings(settings)
   }, [settings])
 
+  // Effective UI language: 'auto' follows the browser UI language (navigator.language).
+  const uiLang: 'ja' | 'en' =
+    settings.language === 'auto'
+      ? (navigator.language.toLowerCase().startsWith('ja') ? 'ja' : 'en')
+      : settings.language
+
   const t = (key: keyof typeof translations.ja) => {
-    return translations[settings.language][key]
+    return translations[uiLang][key]
   }
 
   return (
@@ -59,12 +65,23 @@ function App() {
           </svg>
           {t('title')}
         </h1>
-        <button
-          onClick={() => setSettings({ ...settings, language: settings.language === 'ja' ? 'en' : 'ja' })}
-          className="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded border border-gray-600 transition-colors"
-        >
-          {settings.language === 'ja' ? 'English' : '日本語'}
-        </button>
+        <div className="flex items-center gap-1" role="group" aria-label={t('language')}>
+          {(['auto', 'ja', 'en'] as const).map((lng) => (
+            <button
+              key={lng}
+              onClick={() => setSettings({ ...settings, language: lng })}
+              aria-pressed={settings.language === lng}
+              className={`text-xs px-2 py-1 rounded border transition-colors ${
+                settings.language === lng
+                  ? 'bg-red-600 border-red-600 text-white'
+                  : 'bg-gray-800 hover:bg-gray-700 border-gray-600 text-gray-300'
+              }`}
+              title={lng === 'auto' ? 'Auto (follow browser language)' : lng === 'ja' ? '日本語' : 'English'}
+            >
+              {lng === 'auto' ? 'Auto' : lng === 'ja' ? '日本語' : 'EN'}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-6">

@@ -1,7 +1,8 @@
 import { parseViewCount, isLive } from './parser';
+import { resolveSpec, isDateText, hasViewKeyword, isLiveText, looksNumericCount } from './locales';
 import type { Settings } from './types';
 
-export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {
+export const processVideoElement = (element: HTMLElement, settings: Settings, index: number, lang?: string) => {
     // Set to true for verbose logging during development
     const debug = true;
 
@@ -55,41 +56,43 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
         if (debug) console.log(`TubeFilter [${index}]: Live badge found`);
     }
 
-    // Iterate spans to find view count pattern
+    // Resolve the locale spec for the current YouTube page language.
+    const spec = resolveSpec(lang);
+
+    // Iterate spans to find the view-count span (locale-aware).
     let foundViewCount = false;
     for (const span of spans) {
         const text = span.textContent?.trim() || '';
         if (debug) console.log(`TubeFilter [${index}]: Checking span text: "${text}"`);
 
-        // Skip if it looks like a date
-        if (text.includes('ago') || text.includes('前')) continue;
+        // Skip date / past-stream timestamps.
+        if (isDateText(text, spec)) continue;
 
-        // Check for specific view count keywords
-        if (/(views|view|回視聴|視聴|watching|人|人が視聴中)/i.test(text)) {
+        // A span with the locale's "views" keyword — or a live-viewer span like
+        // "12K watching" / "1,2 mil espectadores" — is the count-bearing span.
+        if (hasViewKeyword(text, spec) || isLiveText(text, spec)) {
             viewCountText = text;
-            if (isLive(text)) isStream = true;
+            if (isLive(text, lang)) isStream = true;
             foundViewCount = true;
             break;
         }
     }
 
-    // Fallback: if no keyword found, look for strict number patterns
+    // Fallback: a bare numeric count (e.g. English "62K" with no "views" word).
     if (!foundViewCount) {
         for (const span of spans) {
             const text = span.textContent?.trim() || '';
             if (debug) console.log(`TubeFilter [${index}]: Checking fallback text: "${text}"`);
-            if (text.includes('ago') || text.includes('前')) continue;
+            if (isDateText(text, spec)) continue;
 
-            // Strict number pattern: digits, commas, dots, optional K/M/B/万/億 suffix
-            // And NO other characters (except whitespace)
-            if (/^[\d,.]+\s*[KMB万億]?$/i.test(text)) {
+            if (looksNumericCount(text, spec)) {
                 viewCountText = text;
                 break;
             }
         }
     }
 
-    const views = parseViewCount(viewCountText);
+    const views = parseViewCount(viewCountText, lang);
     if (debug) console.log(`TubeFilter [${index}]: Parsed views: ${views} from "${viewCountText}" (Live: ${isStream})`);
 
     // Check for Mix list

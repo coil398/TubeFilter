@@ -10,7 +10,7 @@ export const defaultSettings: Settings = {
     enableBannerFilter: true,
     enableMixFilter: true,
     enableShortsFilter: true,
-    language: 'ja',
+    language: 'auto',
 };
 
 // Flat key layout preserved (one top-level key per field), identical to the
