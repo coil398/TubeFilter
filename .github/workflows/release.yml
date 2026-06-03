@@ -22,18 +22,18 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci   # postinstall runs `wxt prepare`
 
-      - name: Build extension
-        run: npm run build
+      - name: Zip Chrome extension
+        run: npm run zip
 
-      - name: Zip extension
-        run: |
-          cd dist
-          zip -r ../tubefilter.zip ./*
+      - name: Zip Firefox extension
+        run: npm run zip:firefox
 
-      - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: tubefilter.zip
+          files: |
+            .output/tube-filter-*-chrome.zip
+            .output/tube-filter-*-firefox.zip

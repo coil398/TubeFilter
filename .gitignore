@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# WXT
+.output
+.wxt
+
 # Tooling caches
 .serena/
 

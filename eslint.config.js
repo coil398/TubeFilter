@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['.output', '.wxt', 'dist']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -17,7 +17,14 @@ export default defineConfig([
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        // WXT auto-imported globals (no explicit import in src/)
+        defineContentScript: 'readonly',
+        defineBackground: 'readonly',
+        storage: 'readonly',
+        browser: 'readonly',
+      },
     },
   },
 ])

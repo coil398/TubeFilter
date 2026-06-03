@@ -1,4 +1,4 @@
-import { parseViewCount, isLive } from './src/content/parser';
+import { parseViewCount, isLive } from './src/utils/parser';
 
 const testCases = [
     { input: '1.2万回視聴', expected: 12000 },

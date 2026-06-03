@@ -1,16 +1,5 @@
 import { parseViewCount, isLive } from './parser';
-
-export interface Settings {
-    minViews: number;
-    minConcurrent: number;
-    filterMode: 'hide' | 'opacity';
-    enableVideoFilter: boolean;
-    enableLiveFilter: boolean;
-    enableBannerFilter: boolean;
-    enableMixFilter: boolean;
-    enableShortsFilter: boolean;
-    language: 'ja' | 'en';
-}
+import type { Settings } from './types';
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number) => {
     // Set to true for verbose logging during development

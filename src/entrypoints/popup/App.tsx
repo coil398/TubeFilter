@@ -1,28 +1,6 @@
 import { useEffect, useState } from 'react'
-
-interface Settings {
-  minViews: number
-  minConcurrent: number
-  filterMode: 'hide' | 'opacity'
-  enableVideoFilter: boolean
-  enableLiveFilter: boolean
-  enableBannerFilter: boolean
-  enableMixFilter: boolean
-  enableShortsFilter: boolean
-  language: 'ja' | 'en'
-}
-
-const defaultSettings: Settings = {
-  minViews: 1000,
-  minConcurrent: 50,
-  filterMode: 'opacity',
-  enableVideoFilter: true,
-  enableLiveFilter: true,
-  enableBannerFilter: true,
-  enableMixFilter: true,
-  enableShortsFilter: true,
-  language: 'ja',
-}
+import type { Settings } from '@/utils/types'
+import { defaultSettings, loadSettings, saveSettings } from '@/utils/storage'
 
 const translations = {
   ja: {
@@ -61,13 +39,11 @@ function App() {
   const [settings, setSettings] = useState<Settings>(defaultSettings)
 
   useEffect(() => {
-    chrome.storage.local.get(defaultSettings as unknown as { [key: string]: unknown }, (items) => {
-      setSettings(items as unknown as Settings)
-    })
+    void loadSettings().then(setSettings)
   }, [])
 
   useEffect(() => {
-    chrome.storage.local.set(settings)
+    void saveSettings(settings)
   }, [settings])
 
   const t = (key: keyof typeof translations.ja) => {
