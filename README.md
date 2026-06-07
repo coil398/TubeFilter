@@ -64,6 +64,20 @@ These three filters are unconditional on/off switches — they ignore view count
 | **Mix Lists** | `enableMixFilter` | Auto-generated Mix / radio playlists. |
 | **Shorts** | `enableShortsFilter` | Shorts links and shelves. |
 
+### Channel rules & keyword filter
+
+Beyond the numeric thresholds, you can hard-allow or hard-hide by channel, and hide by title text — managed in the popup as one-entry-per-line lists.
+
+- **Always-hide channels** (`channelBlocklist`) — videos from these channels are always hidden, regardless of view count.
+- **Always-show channels** (`channelAllowlist`) — videos from these channels are never filtered (handy for favourite small creators below your `minViews`).
+- **Hide titles containing** (`titleKeywords`) — hide videos whose title contains any listed term. An entry wrapped in slashes (e.g. `/spoiler.*ending/`) is treated as a case-insensitive **regular expression**; otherwise it is a plain case-insensitive substring.
+
+Channels are matched **exactly** by `@handle`, channel ID, or channel name (so `mr` does **not** match `@MrBeast`). These rules apply to individual video / playlist / Mix cards, but **not** to aggregate shelves (e.g. the Shorts shelf), so one child never hides a whole row.
+
+### Where filtering applies
+
+The content script runs across YouTube and re-filters as you navigate — Home, Search, Subscriptions, the watch-page sidebar recommendations, and channel pages — covering both the legacy renderers and the newer `yt-lockup-view-model` layout.
+
 ### Filter modes: Hide vs. Opacity
 
 The **Filter Mode** selector decides how filtered videos/live streams are treated:
@@ -77,10 +91,15 @@ The **Filter Mode** selector decides how filtered videos/live streams are treate
 
 Each card is classified once, using a fixed if/else order. Only the first matching category's rule applies:
 
-1. **Shorts** (highest priority)
-2. **Mix lists**
-3. **Live streams**
-4. **Regular videos**
+1. **Channel blocklist** — always hide (highest priority)
+2. **Channel allowlist** — always show (skips every rule below)
+3. **Title keyword** — hide matching titles
+4. **Shorts**
+5. **Mix lists**
+6. **Live streams**
+7. **Regular videos**
+
+(Channel/keyword rules 1–3 apply to individual cards only, not aggregate shelves.)
 
 ### Disable auto-dubbing (force original audio)
 
@@ -161,6 +180,9 @@ Open the extension popup to adjust filtering. Changes are saved immediately and 
 | `enableMixFilter` | Hide Mix lists | on/off toggle | `true` | ミックスリスト非表示 | Hide Mix Lists |
 | `enableShortsFilter` | Hide Shorts | on/off toggle | `true` | ショート動画非表示 | Hide Shorts |
 | `forceOriginalAudio` | Force the original audio track (undo auto-dubbing) on watch pages and Shorts | on/off toggle | `true` | 元の音声に固定 | Force Original Audio |
+| `channelAllowlist` | Channels to never filter (always show), one per line; matched by @handle, ID, or name | textarea list | `[]` | 常に表示するチャンネル | Always-show channels |
+| `channelBlocklist` | Channels to always hide, one per line | textarea list | `[]` | 常に非表示のチャンネル | Always-hide channels |
+| `titleKeywords` | Hide videos whose title contains a term; `/…/` entries are case-insensitive regex | textarea list | `[]` | この語を含むタイトルを非表示 | Hide titles containing |
 | `language` | Popup UI language: `auto` + 9 locales (`en`/`ja`/`es`/`pt`/`de`/`fr`/`ru`/`ko`/`zh`); **Auto** follows the browser UI language (`navigator.language`) | dropdown selector | `auto` | Language | 言語 |
 
 Both sliders show their value thousands-separated via `toLocaleString()`. A helper note sits beneath the Min Concurrent slider:
