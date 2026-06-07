@@ -6,12 +6,12 @@ export default defineContentScript({
     matches: ['https://www.youtube.com/*'],
     runAt: 'document_end',
     main() {
+        const debug = import.meta.env.DEV;
         let currentSettings: Settings = defaultSettings;
         let timeoutId: number | null = null;
 
         const runFilter = () => {
-            const BUILD_TIMESTAMP = '2025-12-05T16:10:00';
-            console.log(`TubeFilter: runFilter started (Build: ${BUILD_TIMESTAMP})`);
+            if (debug) console.log('TubeFilter: runFilter started');
 
             // Detect the YouTube page language for locale-aware view-count parsing
             // (e.g. "1,7 Mrd." in de vs "1.7B" in en vs "17億" in ja).
@@ -24,7 +24,8 @@ export default defineContentScript({
                 'ytd-grid-video-renderer', // Channel
                 'ytd-radio-renderer', // Mix lists
                 'ytd-reel-item-renderer', // Shorts (individual)
-                'ytd-rich-shelf-renderer' // Shorts (shelf)
+                'ytd-rich-shelf-renderer', // Shorts (shelf)
+                'yt-lockup-view-model' // New layout (watch sidebar, channel, home)
             ];
 
             const bannerSelectors = [
@@ -40,19 +41,14 @@ export default defineContentScript({
             ];
 
             const videos = document.querySelectorAll(videoSelectors.join(','));
-            console.log(`TubeFilter: Found ${videos.length} video elements`);
+            if (debug) console.log(`TubeFilter: Found ${videos.length} video elements`);
 
             videos.forEach((video, index) => {
                 processVideoElement(video as HTMLElement, currentSettings, index, pageLang);
             });
 
             const banners = document.querySelectorAll(bannerSelectors.join(','));
-            console.log(`TubeFilter: Found ${banners.length} banner elements`);
-            if (document.querySelector('#big-yoodle')) {
-                console.log('TubeFilter: #big-yoodle FOUND in DOM');
-            } else {
-                console.log('TubeFilter: #big-yoodle NOT found in DOM');
-            }
+            if (debug) console.log(`TubeFilter: Found ${banners.length} banner elements`);
 
             banners.forEach((banner) => {
                 // If we found the inner banner element, we want to hide its parent section

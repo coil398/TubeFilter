@@ -11,6 +11,9 @@ export const defaultSettings: Settings = {
     enableMixFilter: true,
     enableShortsFilter: true,
     forceOriginalAudio: true,
+    channelAllowlist: [],
+    channelBlocklist: [],
+    titleKeywords: [],
     language: 'auto',
 };
 

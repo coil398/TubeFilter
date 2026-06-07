@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Settings } from '@/utils/types'
 import { defaultSettings, loadSettings, saveSettings } from '@/utils/storage'
 import { detectLang, type LangKey } from '@/utils/locales'
@@ -17,6 +17,10 @@ const translations = {
     hideMixLists: 'Hide Mix Lists',
     hideShorts: 'Hide Shorts',
     forceOriginalAudio: 'Force Original Audio',
+    channelAllowlist: 'Always-show channels',
+    channelBlocklist: 'Always-hide channels',
+    titleKeywords: 'Hide titles containing',
+    listHint: 'One entry per line',
     liveStreamNote: 'Live streams with fewer viewers will be filtered.',
     language: 'Language',
   },
@@ -33,6 +37,10 @@ const translations = {
     hideMixLists: 'ミックスリスト非表示',
     hideShorts: 'ショート動画非表示',
     forceOriginalAudio: '元の音声に固定',
+    channelAllowlist: '常に表示するチャンネル',
+    channelBlocklist: '常に非表示のチャンネル',
+    titleKeywords: 'この語を含むタイトルを非表示',
+    listHint: '1行に1つ',
     liveStreamNote: '視聴者数が少ないライブ配信はフィルタリングされます。',
     language: '言語',
   },
@@ -49,6 +57,10 @@ const translations = {
     hideMixLists: 'Ocultar listas de mezclas',
     hideShorts: 'Ocultar Shorts',
     forceOriginalAudio: 'Forzar audio original',
+    channelAllowlist: 'Canales siempre visibles',
+    channelBlocklist: 'Canales siempre ocultos',
+    titleKeywords: 'Ocultar títulos que contengan',
+    listHint: 'Una entrada por línea',
     liveStreamNote: 'Se filtrarán los directos con menos espectadores.',
     language: 'Idioma',
   },
@@ -65,6 +77,10 @@ const translations = {
     hideMixLists: 'Ocultar listas Mix',
     hideShorts: 'Ocultar Shorts',
     forceOriginalAudio: 'Forçar áudio original',
+    channelAllowlist: 'Canais sempre visíveis',
+    channelBlocklist: 'Canais sempre ocultos',
+    titleKeywords: 'Ocultar títulos com estas palavras',
+    listHint: 'Um item por linha',
     liveStreamNote: 'Transmissões ao vivo com menos espectadores serão filtradas.',
     language: 'Idioma',
   },
@@ -81,6 +97,10 @@ const translations = {
     hideMixLists: 'Mix-Listen ausblenden',
     hideShorts: 'Shorts ausblenden',
     forceOriginalAudio: 'Originalton erzwingen',
+    channelAllowlist: 'Immer anzeigen: Kanäle',
+    channelBlocklist: 'Immer ausblenden: Kanäle',
+    titleKeywords: 'Titel mit diesen Wörtern ausblenden',
+    listHint: 'Ein Eintrag pro Zeile',
     liveStreamNote: 'Livestreams mit wenigen Zuschauern werden gefiltert.',
     language: 'Sprache',
   },
@@ -97,6 +117,10 @@ const translations = {
     hideMixLists: 'Masquer les mix',
     hideShorts: 'Masquer les Shorts',
     forceOriginalAudio: 'Forcer l’audio original',
+    channelAllowlist: 'Chaînes toujours affichées',
+    channelBlocklist: 'Chaînes toujours masquées',
+    titleKeywords: 'Masquer les titres contenant',
+    listHint: 'Une entrée par ligne',
     liveStreamNote: 'Les directs avec peu de spectateurs seront filtrés.',
     language: 'Langue',
   },
@@ -113,6 +137,10 @@ const translations = {
     hideMixLists: 'Скрыть Микс-плейлисты',
     hideShorts: 'Скрыть Shorts',
     forceOriginalAudio: 'Оригинальная озвучка',
+    channelAllowlist: 'Всегда показывать каналы',
+    channelBlocklist: 'Всегда скрывать каналы',
+    titleKeywords: 'Скрывать названия с этими словами',
+    listHint: 'По одному в строке',
     liveStreamNote: 'Трансляции с малым числом зрителей будут отфильтрованы.',
     language: 'Язык',
   },
@@ -129,6 +157,10 @@ const translations = {
     hideMixLists: '믹스 목록 숨기기',
     hideShorts: '쇼츠 숨기기',
     forceOriginalAudio: '원본 오디오 사용',
+    channelAllowlist: '항상 표시할 채널',
+    channelBlocklist: '항상 숨길 채널',
+    titleKeywords: '이 단어가 포함된 제목 숨기기',
+    listHint: '한 줄에 하나씩',
     liveStreamNote: '시청자 수가 적은 라이브 방송은 필터링됩니다.',
     language: '언어',
   },
@@ -145,6 +177,10 @@ const translations = {
     hideMixLists: '隐藏合辑列表',
     hideShorts: '隐藏 Shorts',
     forceOriginalAudio: '强制原始音轨',
+    channelAllowlist: '始终显示的频道',
+    channelBlocklist: '始终隐藏的频道',
+    titleKeywords: '隐藏含这些词的标题',
+    listHint: '每行一个',
     liveStreamNote: '观看人数较少的直播将被过滤。',
     language: '语言',
   },
@@ -152,14 +188,34 @@ const translations = {
 
 function App() {
   const [settings, setSettings] = useState<Settings>(defaultSettings)
+  const [listDraft, setListDraft] = useState<Record<'channelAllowlist' | 'channelBlocklist' | 'titleKeywords', string>>({
+    channelAllowlist: '', channelBlocklist: '', titleKeywords: '',
+  })
+  const listTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   useEffect(() => {
-    void loadSettings().then(setSettings)
+    void loadSettings().then((s) => {
+      setSettings(s)
+      setListDraft({
+        channelAllowlist: s.channelAllowlist.join('\n'),
+        channelBlocklist: s.channelBlocklist.join('\n'),
+        titleKeywords: s.titleKeywords.join('\n'),
+      })
+    })
   }, [])
 
   useEffect(() => {
     void saveSettings(settings)
   }, [settings])
+
+  // Debounced commit so typing a long list doesn't re-filter every tab per keystroke.
+  const onListChange = (field: 'channelAllowlist' | 'channelBlocklist' | 'titleKeywords', value: string) => {
+    setListDraft((d) => ({ ...d, [field]: value }))
+    if (listTimers.current[field]) clearTimeout(listTimers.current[field])
+    listTimers.current[field] = setTimeout(() => {
+      setSettings((s) => ({ ...s, [field]: value.split('\n') }))
+    }, 400)
+  }
 
   // Effective UI language: 'auto' follows the browser UI language (navigator.language),
   // mapped to one of the 9 supported locales (falling back to English).
@@ -362,6 +418,27 @@ function App() {
               {t('modeOpacity')}
             </button>
           </div>
+        </div>
+
+        {/* Channel lists & keyword filter */}
+        <div className="space-y-3 pt-2 border-t border-gray-800">
+          {([
+            { key: 'channelAllowlist', field: 'channelAllowlist' },
+            { key: 'channelBlocklist', field: 'channelBlocklist' },
+            { key: 'titleKeywords', field: 'titleKeywords' },
+          ] as const).map(({ key, field }) => (
+            <div key={key} className="space-y-1">
+              <label className="text-sm font-medium text-gray-300 block">{t(key)}</label>
+              <textarea
+                value={listDraft[field]}
+                onChange={(e) => onListChange(field, e.target.value)}
+                aria-label={t(key)}
+                rows={2}
+                placeholder={t('listHint')}
+                className="w-full text-xs bg-gray-800 text-gray-200 border border-gray-700 rounded px-2 py-1 resize-y focus:outline-none focus:ring-1 focus:ring-red-500"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>

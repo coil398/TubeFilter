@@ -3,15 +3,23 @@ import { resolveSpec, isDateText, hasViewKeyword, isLiveText, looksNumericCount 
 import type { Settings } from './types';
 
 export const processVideoElement = (element: HTMLElement, settings: Settings, index: number, lang?: string) => {
-    // Set to true for verbose logging during development
-    const debug = true;
+    // Verbose logging in dev builds only (silent in production builds).
+    const debug = import.meta.env.DEV;
 
     if (debug) console.log(`TubeFilter [${index}]: Processing element`, element);
+
+    // Avoid double-processing: on grids the outer ytd-rich-item-renderer wraps a
+    // yt-lockup-view-model. Let the wrapper own styling and skip the nested lockup
+    // (watch-sidebar lockups are not wrapped, so they are still processed).
+    if (element.tagName.toLowerCase() === 'yt-lockup-view-model' && element.closest('ytd-rich-item-renderer')) {
+        return;
+    }
 
     // Check if the element is fully loaded by looking for the title
     const titleElement = element.querySelector('#video-title') ||
         element.querySelector('#video-title-link') ||
-        element.querySelector('.yt-lockup-metadata-view-model__title');
+        element.querySelector('.yt-lockup-metadata-view-model__title') ||
+        element.querySelector('h3 a, h3'); // new yt-lockup-view-model layout
 
     // Special check for Shorts shelf or items which might not have standard video titles
     const isShortsElement = element.tagName.toLowerCase() === 'ytd-rich-shelf-renderer' ||
@@ -115,29 +123,63 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
         if (debug) console.log(`TubeFilter [${index}]: Shorts detected`);
     }
 
-    let shouldFilter = false;
+    // Channel identity. Old layout: ytd-channel-name / an @handle link.
+    // New yt-lockup layout: the first metadata span is the channel name.
+    const channelHref = (element.querySelector('a[href^="/@"], a[href*="/channel/"]')?.getAttribute('href') ?? '').toLowerCase();
+    let channelName = element.querySelector('ytd-channel-name #text, ytd-channel-name a, #channel-name #text, #channel-name a')?.textContent?.trim() ?? '';
+    if (!channelName) {
+        channelName = element.querySelector('yt-content-metadata-view-model span')?.textContent?.trim() ?? '';
+    }
+    const channelLower = channelName.toLowerCase();
 
-    if (isShorts) {
-        if (settings.enableShortsFilter) {
-            shouldFilter = true;
+    // Exact handle / channel-id / name matching (no substring — "cat" must not
+    // match "@catlover" or a /channel/<id> that happens to contain "cat").
+    const hrefHandle = channelHref.match(/\/@([^/?]+)/)?.[1] ?? '';
+    const hrefId = channelHref.match(/\/channel\/([^/?]+)/)?.[1] ?? '';
+    const channelInList = (list: string[]): boolean => list.some((raw) => {
+        const e = raw.trim().toLowerCase();
+        if (!e) return false;
+        const eHandle = e.replace(/^@/, '');
+        return channelLower === e || (!!hrefHandle && hrefHandle === eHandle) || (!!hrefId && hrefId === e);
+    });
+
+    const title = titleElement?.textContent?.trim() ?? '';
+    const titleLower = title.toLowerCase();
+    const titleHitsKeyword = settings.titleKeywords.some((raw) => {
+        const k = raw.trim();
+        if (!k) return false;
+        // "/pattern/" is treated as a case-insensitive regex; otherwise substring.
+        if (k.length > 2 && k.startsWith('/') && k.endsWith('/')) {
+            try { return new RegExp(k.slice(1, -1), 'i').test(title); } catch { return false; }
         }
+        return titleLower.includes(k.toLowerCase());
+    });
+
+    let shouldFilter = false;
+    let reason = '';
+
+    // Channel/keyword overrides apply to individual cards only — NOT aggregate
+    // shelves (where querySelector matches an arbitrary first child). They DO
+    // apply to single video/playlist/mix cards of a matched channel/title.
+    if (!isShortsElement && channelInList(settings.channelBlocklist)) {
+        shouldFilter = true; reason = 'channel-blocklist';
+    } else if (!isShortsElement && channelInList(settings.channelAllowlist)) {
+        shouldFilter = false; reason = 'channel-allowlist'; // always show
+    } else if (!isShortsElement && titleHitsKeyword) {
+        shouldFilter = true; reason = 'title-keyword';
+    } else if (isShorts) {
+        if (settings.enableShortsFilter) { shouldFilter = true; reason = 'shorts'; }
     } else if (isMix) {
-        if (settings.enableMixFilter) {
-            shouldFilter = true;
-        }
+        if (settings.enableMixFilter) { shouldFilter = true; reason = 'mix'; }
     } else if (isStream) {
-        if (settings.enableLiveFilter && views !== null && views < settings.minConcurrent) {
-            shouldFilter = true;
-        }
+        if (settings.enableLiveFilter && views !== null && views < settings.minConcurrent) { shouldFilter = true; reason = 'live'; }
     } else {
-        if (settings.enableVideoFilter && views !== null && views < settings.minViews) {
-            shouldFilter = true;
-        }
+        if (settings.enableVideoFilter && views !== null && views < settings.minViews) { shouldFilter = true; reason = 'views'; }
     }
 
     // Apply filter
     if (shouldFilter) {
-        console.log(`TubeFilter [${index}]: FILTERED (Shorts: ${isShorts}, Mix: ${isMix}, Views: ${views}, Min: ${isStream ? settings.minConcurrent : settings.minViews})`);
+        if (debug) console.log(`TubeFilter [${index}]: FILTERED (${reason}; Views: ${views}, Channel: "${channelName}")`);
         if (settings.filterMode === 'hide') {
             element.style.display = 'none';
         } else {
