@@ -22,6 +22,7 @@ export default defineConfig([
         // WXT auto-imported globals (no explicit import in src/)
         defineContentScript: 'readonly',
         defineBackground: 'readonly',
+        defineUnlistedScript: 'readonly',
         storage: 'readonly',
         browser: 'readonly',
       },

@@ -14,6 +14,14 @@ export default defineConfig({
     description: 'Filter YouTube videos based on views and other metrics.',
     permissions: ['storage'],
     host_permissions: ['https://www.youtube.com/*'],
+    // The MAIN-world player script is injected via injectScript(), so it must be
+    // web-accessible (WXT does not auto-add it — see wxt issue #536).
+    web_accessible_resources: [
+      {
+        resources: ['youtube-audio-main.js'],
+        matches: ['https://www.youtube.com/*'],
+      },
+    ],
     // gecko.id required for AMO (MV3). Harmless on Chrome (ignored).
     browser_specific_settings: {
       gecko: {

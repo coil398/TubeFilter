@@ -10,6 +10,7 @@ export const defaultSettings: Settings = {
     enableBannerFilter: true,
     enableMixFilter: true,
     enableShortsFilter: true,
+    forceOriginalAudio: true,
     language: 'auto',
 };
 

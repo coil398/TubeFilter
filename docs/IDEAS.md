@@ -35,6 +35,7 @@ Effort: S (≲ half-day) · M (≲ couple days) · L (larger)
 
 | Idea | Value | Effort | Status |
 |---|---|---|---|
+| **Disable auto-dubbing (force original audio)** — switch the player to the original audio track on watch/Shorts (MAIN-world injectScript) | High | M | **done** |
 | **More surfaces** — Subscriptions feed, watch-page sidebar recommendations, channel pages | High | M | proposed |
 | **Selector robustness + self-diagnostics** — resist YouTube DOM changes | Med | M | proposed |
 | **Verified live-now keywords per locale** — current live-viewer words are best-effort (see locales.ts) | Low | M | proposed |

@@ -7,5 +7,6 @@ export interface Settings {
     enableBannerFilter: boolean;
     enableMixFilter: boolean;
     enableShortsFilter: boolean;
+    forceOriginalAudio: boolean;
     language: 'auto' | 'en' | 'ja' | 'es' | 'pt' | 'de' | 'fr' | 'ru' | 'ko' | 'zh';
 }

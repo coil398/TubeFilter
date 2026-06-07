@@ -82,6 +82,15 @@ Each card is classified once, using a fixed if/else order. Only the first matchi
 3. **Live streams**
 4. **Regular videos**
 
+### Disable auto-dubbing (force original audio)
+
+YouTube's automatic dubbing replaces a video's audio with an AI-translated track based on your interface language — so an English video plays in Japanese, German, etc. by default. With **Force Original Audio** (`forceOriginalAudio`, **on by default**), TubeFilter detects the original audio track and switches the player to it automatically on every video and Short, undoing the auto-dub.
+
+- Works on `/watch` videos and Shorts, re-applied on each in-app navigation.
+- The original track is identified **language-independently** by decoding the player's audio-track id (the original track's data contains `original`; dubbed tracks contain `dubbed` / `dubbed-auto`).
+- Implemented via a **MAIN-world script** injected into the page — YouTube's player audio API is not reachable from the isolated content-script world — with the setting bridged from the extension's storage.
+- Toggle it off anytime in the popup to keep YouTube's dubbed audio.
+
 ### Multi-language view-count detection
 
 YouTube renders view and viewer counts **very differently per page language** — not just translated words, but different decimal/thousand separators and abbreviation units. The same ~1.7-billion count appears as:
@@ -151,6 +160,7 @@ Open the extension popup to adjust filtering. Changes are saved immediately and 
 | `enableBannerFilter` | Hide promotional top banners | on/off toggle | `true` | トップバナー非表示 | Hide Top Banner |
 | `enableMixFilter` | Hide Mix lists | on/off toggle | `true` | ミックスリスト非表示 | Hide Mix Lists |
 | `enableShortsFilter` | Hide Shorts | on/off toggle | `true` | ショート動画非表示 | Hide Shorts |
+| `forceOriginalAudio` | Force the original audio track (undo auto-dubbing) on watch pages and Shorts | on/off toggle | `true` | 元の音声に固定 | Force Original Audio |
 | `language` | Popup UI language: `auto` + 9 locales (`en`/`ja`/`es`/`pt`/`de`/`fr`/`ru`/`ko`/`zh`); **Auto** follows the browser UI language (`navigator.language`) | dropdown selector | `auto` | Language | 言語 |
 
 Both sliders show their value thousands-separated via `toLocaleString()`. A helper note sits beneath the Min Concurrent slider:

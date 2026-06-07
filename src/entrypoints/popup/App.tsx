@@ -16,6 +16,7 @@ const translations = {
     hideTopBanner: 'Hide Top Banner',
     hideMixLists: 'Hide Mix Lists',
     hideShorts: 'Hide Shorts',
+    forceOriginalAudio: 'Force Original Audio',
     liveStreamNote: 'Live streams with fewer viewers will be filtered.',
     language: 'Language',
   },
@@ -31,6 +32,7 @@ const translations = {
     hideTopBanner: 'トップバナー非表示',
     hideMixLists: 'ミックスリスト非表示',
     hideShorts: 'ショート動画非表示',
+    forceOriginalAudio: '元の音声に固定',
     liveStreamNote: '視聴者数が少ないライブ配信はフィルタリングされます。',
     language: '言語',
   },
@@ -46,6 +48,7 @@ const translations = {
     hideTopBanner: 'Ocultar banner superior',
     hideMixLists: 'Ocultar listas de mezclas',
     hideShorts: 'Ocultar Shorts',
+    forceOriginalAudio: 'Forzar audio original',
     liveStreamNote: 'Se filtrarán los directos con menos espectadores.',
     language: 'Idioma',
   },
@@ -61,6 +64,7 @@ const translations = {
     hideTopBanner: 'Ocultar banner superior',
     hideMixLists: 'Ocultar listas Mix',
     hideShorts: 'Ocultar Shorts',
+    forceOriginalAudio: 'Forçar áudio original',
     liveStreamNote: 'Transmissões ao vivo com menos espectadores serão filtradas.',
     language: 'Idioma',
   },
@@ -76,6 +80,7 @@ const translations = {
     hideTopBanner: 'Top-Banner ausblenden',
     hideMixLists: 'Mix-Listen ausblenden',
     hideShorts: 'Shorts ausblenden',
+    forceOriginalAudio: 'Originalton erzwingen',
     liveStreamNote: 'Livestreams mit wenigen Zuschauern werden gefiltert.',
     language: 'Sprache',
   },
@@ -91,6 +96,7 @@ const translations = {
     hideTopBanner: 'Masquer la bannière',
     hideMixLists: 'Masquer les mix',
     hideShorts: 'Masquer les Shorts',
+    forceOriginalAudio: 'Forcer l’audio original',
     liveStreamNote: 'Les directs avec peu de spectateurs seront filtrés.',
     language: 'Langue',
   },
@@ -106,6 +112,7 @@ const translations = {
     hideTopBanner: 'Скрыть верхний баннер',
     hideMixLists: 'Скрыть Микс-плейлисты',
     hideShorts: 'Скрыть Shorts',
+    forceOriginalAudio: 'Оригинальная озвучка',
     liveStreamNote: 'Трансляции с малым числом зрителей будут отфильтрованы.',
     language: 'Язык',
   },
@@ -121,6 +128,7 @@ const translations = {
     hideTopBanner: '상단 배너 숨기기',
     hideMixLists: '믹스 목록 숨기기',
     hideShorts: '쇼츠 숨기기',
+    forceOriginalAudio: '원본 오디오 사용',
     liveStreamNote: '시청자 수가 적은 라이브 방송은 필터링됩니다.',
     language: '언어',
   },
@@ -136,6 +144,7 @@ const translations = {
     hideTopBanner: '隐藏顶部横幅',
     hideMixLists: '隐藏合辑列表',
     hideShorts: '隐藏 Shorts',
+    forceOriginalAudio: '强制原始音轨',
     liveStreamNote: '观看人数较少的直播将被过滤。',
     language: '语言',
   },
@@ -305,6 +314,23 @@ function App() {
               <div
                 className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
                   settings.enableShortsFilter ? 'left-6' : 'left-1'
+                }`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="font-medium text-gray-300">{t('forceOriginalAudio')}</label>
+            <button
+              onClick={() => setSettings({ ...settings, forceOriginalAudio: !settings.forceOriginalAudio })}
+              aria-pressed={settings.forceOriginalAudio}
+              className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ${
+                settings.forceOriginalAudio ? 'bg-red-600' : 'bg-gray-700'
+              }`}
+              title={settings.forceOriginalAudio ? 'Original audio (on)' : 'Original audio (off)'}
+            >
+              <div
+                className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-transform ${
+                  settings.forceOriginalAudio ? 'left-6' : 'left-1'
                 }`}
               />
             </button>
