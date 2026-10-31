@@ -34,6 +34,7 @@ export default defineContentScript({
                 'ytd-statement-banner-renderer', // Specific banner renderer
                 'ytd-rich-section-renderer > #content > ytd-statement-banner-renderer',
                 'ytd-rich-section-renderer > #content > ytd-banner-promo-renderer-background',
+                'ytd-rich-section-renderer > #content > ytd-brand-video-shelf-renderer', // YouTube promo shelf
                 'ytd-banner-promo-renderer', // General promo banner
                 'ytd-ad-slot-renderer', // Ad slot
                 'ytd-in-feed-ad-layout-renderer', // In-feed ad
@@ -50,14 +51,27 @@ export default defineContentScript({
             const banners = document.querySelectorAll(bannerSelectors.join(','));
             if (debug) console.log(`TubeFilter: Found ${banners.length} banner elements`);
 
+            const bannerSections = new Set<Element>();
             banners.forEach((banner) => {
                 // If we found the inner banner element, we want to hide its parent section
                 const section = banner.closest('ytd-rich-section-renderer');
                 if (section) {
-                    processBannerElement(section as HTMLElement, currentSettings);
+                    bannerSections.add(section);
                 } else {
                     processBannerElement(banner as HTMLElement, currentSettings);
                 }
+            });
+
+            document.querySelectorAll('ytd-rich-section-renderer').forEach((section) => {
+                const content = section.querySelector(':scope > #content');
+                const hasPromoRenderer = Array.from(content?.children ?? []).some((child) =>
+                    /^ytd-.*(brand|promo|banner|statement).*-renderer$/.test(child.tagName.toLowerCase())
+                );
+                if (hasPromoRenderer) bannerSections.add(section);
+            });
+
+            bannerSections.forEach((section) => {
+                processBannerElement(section as HTMLElement, currentSettings);
             });
         };
 
