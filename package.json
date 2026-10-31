@@ -1,7 +1,8 @@
 {
   "name": "tube-filter",
   "private": true,
-  "version": "1.0.0",
+  "license": "MIT",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "wxt",

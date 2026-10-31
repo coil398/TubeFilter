@@ -373,4 +373,4 @@ Beiträge sind willkommen. Bevor du einen PR eröffnest:
 
 ## Lizenz
 
-Für dieses Projekt wurde keine Lizenz angegeben, und im Repository ist keine `LICENSE`-Datei vorhanden. In Ermangelung einer ausdrücklichen Lizenz sind die Rechte am Code standardmäßig **vollständig vorbehalten** (all rights reserved) — du hast keine Erlaubnis, ihn wiederzuverwenden, weiterzuverbreiten oder zu verändern. Wenn du ihn öffnen möchtest, füge eine `LICENSE`-Datei hinzu, die die Bedingungen festlegt.
+Dieses Projekt wird unter der [MIT-Lizenz](LICENSE) veröffentlicht.

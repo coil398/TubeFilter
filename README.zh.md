@@ -373,4 +373,4 @@ WXT 的配置使用 `srcDir: 'src'` 和 `modules: ['@wxt-dev/module-react']`。�
 
 ## License
 
-本项目未指定任何许可证，仓库中也没有 `LICENSE` 文件。在缺少明确许可证的情况下，代码默认为**保留所有权利**（all rights reserved）— 你没有权限重用、再分发或修改它。如果你打算开放它，请添加一个声明条款的 `LICENSE` 文件。
+本项目根据 [MIT 许可证](LICENSE) 发布。

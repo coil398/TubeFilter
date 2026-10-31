@@ -388,4 +388,4 @@ Contributions are welcome. Before opening a PR:
 
 ## License
 
-No license has been specified for this project, and no `LICENSE` file is present in the repository. Absent an explicit license, the code is **all rights reserved** by default — you do not have permission to reuse, redistribute, or modify it. If you intend to open it up, add a `LICENSE` file declaring the terms.
+This project is released under the [MIT License](LICENSE).

@@ -373,4 +373,4 @@ Las contribuciones son bienvenidas. Antes de abrir un PR:
 
 ## Licencia
 
-No se ha especificado ninguna licencia para este proyecto, y no hay ningún archivo `LICENSE` presente en el repositorio. En ausencia de una licencia explícita, el código queda por defecto con **todos los derechos reservados**: no tienes permiso para reutilizarlo, redistribuirlo ni modificarlo. Si tienes intención de abrirlo, añade un archivo `LICENSE` que declare los términos.
+Este proyecto se publica bajo la [Licencia MIT](LICENSE).

@@ -103,13 +103,13 @@ export const processVideoElement = (element: HTMLElement, settings: Settings, in
     const views = parseViewCount(viewCountText, lang);
     if (debug) console.log(`TubeFilter [${index}]: Parsed views: ${views} from "${viewCountText}" (Live: ${isStream})`);
 
-    // Check for Mix list
+    // Detect Mixes by their renderer, badge, or content-id class. Radio links are not reliable because ordinary videos can carry list=RD<id>&start_radio=1.
     let isMix = false;
-    const radioLink = element.querySelector('a[href*="start_radio=1"], a[href*="list=RD"]');
     const mixBadge = element.querySelector('ytd-thumbnail-overlay-bottom-panel-renderer[overlay-style="MIX"]');
-    // Also check for "Mix" text in title if it's a radio renderer (though we are processing generic elements)
-    // Or if the element itself is a radio renderer (which might be passed here)
-    if (radioLink || mixBadge || element.tagName.toLowerCase() === 'ytd-radio-renderer') {
+    const hasMixContentId = [element, ...element.querySelectorAll('[class*="content-id-RD"]')].some((node) =>
+        Array.from(node.classList).some((className) => /^content-id-RD[\w-]{11,}$/.test(className))
+    );
+    if (hasMixContentId || mixBadge || element.tagName.toLowerCase() === 'ytd-radio-renderer') {
         isMix = true;
         if (debug) console.log(`TubeFilter [${index}]: Mix list detected`);
     }
