@@ -112,8 +112,8 @@ export default defineUnlistedScript(() => {
 
     // Receive the setting from the isolated content script (which owns storage).
     window.addEventListener(CONFIG_EVENT, (e: Event) => {
-        const detail = (e as CustomEvent<{ forceOriginalAudio?: boolean }>).detail;
-        enabled = !!detail?.forceOriginalAudio;
+        const detail = (e as CustomEvent<boolean>).detail;
+        enabled = detail === true;
         if (enabled) applyWithRetry();
         else stopTimer(); // disable immediately (already-switched videos revert on next nav)
     });

@@ -16,7 +16,8 @@ export default defineContentScript({
         await injectScript('/youtube-audio-main.js', { keepInDom: true });
 
         const send = (forceOriginalAudio: boolean) => {
-            window.dispatchEvent(new CustomEvent(CONFIG_EVENT, { detail: { forceOriginalAudio } }));
+            // Firefox page scripts cannot read objects created in the content-script compartment, so pass a primitive.
+            window.dispatchEvent(new CustomEvent(CONFIG_EVENT, { detail: forceOriginalAudio }));
         };
 
         const settings = await loadSettings();
